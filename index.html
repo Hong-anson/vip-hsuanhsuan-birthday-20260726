@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>🎂 2026.07.26 軒軒專屬約會通行證</title>
-    <!-- 引入 Swiper 滑動套件 CSS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
     <style>
         body, html {
@@ -17,7 +16,7 @@
         }
         .header {
             text-align: center;
-            padding: 15px 0 5px 0;
+            padding: 12px 0 5px 0;
             font-size: 18px;
             font-weight: bold;
             color: #d46a6a;
@@ -25,26 +24,26 @@
         }
         .swiper {
             width: 100%;
-            height: calc(100vh - 60px);
-            padding-bottom: 40px;
+            height: calc(100vh - 50px);
+            padding-bottom: 35px;
         }
         .swiper-slide {
             display: flex;
             justify-content: center;
             align-items: center;
-            padding: 10px 20px;
+            padding: 5px 15px;
             box-sizing: border-box;
         }
         .card {
             width: 100%;
             max-width: 380px;
-            height: 82vh;
+            height: 84vh;
             background: #ffffff;
-            border-radius: 28px;
-            box-shadow: 0 15px 35px rgba(212, 106, 106, 0.15);
+            border-radius: 24px;
+            box-shadow: 0 12px 30px rgba(212, 106, 106, 0.15);
             display: flex;
             flex-direction: column;
-            padding: 24px;
+            padding: 20px;
             box-sizing: border-box;
             position: relative;
             border: 2px solid #ffe3e8;
@@ -54,28 +53,28 @@
             align-self: flex-start;
             background: #ff4d6d;
             color: white;
-            padding: 6px 16px;
+            padding: 5px 14px;
             border-radius: 20px;
-            font-size: 14px;
+            font-size: 13px;
             font-weight: bold;
-            margin-bottom: 12px;
-            box-shadow: 0 4px 10px rgba(255, 77, 109, 0.3);
+            margin-bottom: 10px;
+            box-shadow: 0 3px 8px rgba(255, 77, 109, 0.3);
         }
         .card h2 {
             color: #333;
-            font-size: 22px;
-            margin: 0 0 15px 0;
+            font-size: 20px;
+            margin: 0 0 12px 0;
             line-height: 1.3;
         }
         .card-img-box {
             width: 100%;
-            height: 220px;
-            border-radius: 18px;
+            height: 165px;
+            border-radius: 14px;
             overflow: hidden;
-            margin-bottom: 18px;
+            margin-bottom: 12px;
             background-color: #f8f9fa;
             flex-shrink: 0;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+            box-shadow: 0 3px 10px rgba(0,0,0,0.06);
         }
         .card-img-box img {
             width: 100%;
@@ -84,8 +83,8 @@
             display: block;
         }
         .desc {
-            font-size: 16px;
-            line-height: 1.6;
+            font-size: 15px;
+            line-height: 1.5;
             color: #555;
             flex-grow: 1;
             white-space: pre-line;
@@ -97,9 +96,10 @@
             border-radius: 8px;
             font-size: 13px;
             color: #d46a6a;
-            margin-top: 15px;
+            margin-top: 12px;
+            font-weight: 500;
+            flex-shrink: 0;
         }
-        /* 鎖定狀態專用樣式 */
         .locked-box {
             display: flex;
             flex-direction: column;
@@ -109,13 +109,13 @@
             text-align: center;
             background: #fafafa;
             border: 2px dashed #ffb3c0;
-            border-radius: 20px;
-            padding: 20px;
-            margin-top: 10px;
+            border-radius: 16px;
+            padding: 15px;
+            margin-top: 5px;
         }
         .locked-icon {
-            font-size: 50px;
-            margin-bottom: 15px;
+            font-size: 45px;
+            margin-bottom: 10px;
             animation: pulse 2s infinite;
         }
         @keyframes pulse {
@@ -126,17 +126,17 @@
         .timer-box {
             background: #ff4d6d;
             color: white;
-            font-size: 18px;
+            font-size: 16px;
             font-weight: bold;
-            padding: 12px 20px;
-            border-radius: 15px;
-            margin-top: 20px;
-            box-shadow: 0 6px 15px rgba(255, 77, 109, 0.3);
+            padding: 10px 18px;
+            border-radius: 12px;
+            margin-top: 15px;
+            box-shadow: 0 5px 12px rgba(255, 77, 109, 0.3);
             letter-spacing: 1px;
         }
         .swipe-hint {
             position: absolute;
-            bottom: 10px;
+            bottom: 8px;
             width: 100%;
             text-align: center;
             font-size: 12px;
@@ -156,7 +156,7 @@
         <div class="swiper-wrapper" id="card-wrapper">
             <div class="swiper-slide">
                 <div class="card" style="justify-content: center; align-items: center;">
-                    <h3 style="color:#d46a6a;">⏳ 正在載入行程資料...</h3>
+                    <h3 style="color:#d46a6a;">⏳ 正在連線試算表載入中...</h3>
                 </div>
             </div>
         </div>
@@ -168,53 +168,24 @@
     <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
     <script>
         // =========================================================================
-        // 🚨 【設定 1】：Google 試算表 CSV 網址 (如果沒放，會使用下方預設資料)
+        // 🔗 已成功綁定你的 Google 試算表 CSV 串流網址！
         const GOOGLE_SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTIZlbBSdvCM40aIyduz3Jfhkbse_r9btX_i-Nvy51fUQUOZxpJvBfEb9RkLtn9qY0QwSQXzrq19GKC/pub?output=csv"; 
 
-        // 🚨 【設定 2】：壓軸解鎖時間 (嚴格設定為 2026/07/26 晚間 20:15:00)
+        // 🚨 壓軸解鎖時間 (設定為 2026/07/26 晚間 20:15:00)
         const UNLOCK_TIME = new Date("2026-07-26T20:15:00").getTime();
         // =========================================================================
 
-        const defaultData = [
-            {
-                time: "11:30 首部曲",
-                title: "專屬司機與神秘花園 🌸",
-                desc: "恭喜 VIP 軒軒登入 2026 生日約會系統！\n\n今日妳只需要準備好最燦爛的笑容，專屬司機已在建國忠孝路口恭候，為妳奉上第一份生日儀式感。",
-                img: "https://images.unsplash.com/photo-1582794543139-8ac9cb0f7b11?q=80&w=600&auto=format&fit=crop",
-                note: "💡 貼心提醒：花束不用拿著逛街，放車上恆溫保鮮即可！"
-            },
-            {
-                time: "12:30 二部曲",
-                title: "美麗華巨幕史詩《奧德賽》🎬",
-                desc: "為妳準備了全台唯一的滿版大銀幕視覺震撼！\n\n兩人的午後時光，一起沉浸在導演克里斯多福·諾蘭磅礡浩瀚的電影世界中。",
-                img: "https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?q=80&w=600&auto=format&fit=crop",
-                note: "🍿 貼心提醒：爆米花吃少一點，晚上有大餐！"
-            },
-            {
-                time: "16:00 三部曲",
-                title: "午後微醺與光影沙龍照 ☕",
-                desc: "電影散場後，帶妳來到大直最時髦的 NOKE 忠泰樂生活。\n\n在這裡喝杯冷飲、聊聊電影彩蛋，並由專屬攝影師（我本人）幫妳與美美的生日花束拍下今年最滿意的沙龍照！",
-                img: "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?q=80&w=600&auto=format&fit=crop",
-                note: "📸 準備好妳的 Top Model 姿勢！"
-            },
-            {
-                time: "18:30 四部曲",
-                title: "舌尖上的慶生派對 🍷",
-                desc: "來到大直隱藏版老饕餐廳：Restaurant Page 頁小館。\n\n品嚐招牌桶仔雞燉飯與蒜味薯條，在溫馨浪漫的氛圍裡，享受專屬於妳的生日晚餐。",
-                img: "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?q=80&w=600&auto=format&fit=crop",
-                note: "🎂 餐後還有準備一點小小的驚喜..."
-            },
-            {
-                time: "20:30 壓軸大招",
-                title: "？？？第二波神秘任務？？？ 🎁",
-                desc: "妳以為慶生到此結束了嗎？\n\n我們專車直入大直薇閣精品旅館！請盡情開箱豪華主題房型與按摩浴缸...\n\n並且，請等候專屬司機從後車廂為妳呈上今晚真正的壓軸大禮與手寫卡片！💖",
-                img: "https://images.unsplash.com/photo-1582719508461-905c673771fd?q=80&w=600&auto=format&fit=crop",
-                note: "🎉 恭喜解鎖：親口對專屬司機說聲謝謝即可兌換壓軸禮物！"
-            }
-        ];
-
         let countdownInterval = null;
         let currentDataArray = [];
+
+        function safeGet(row, targetKey) {
+            for (let key in row) {
+                if (key.trim().toLowerCase() === targetKey.toLowerCase()) {
+                    return row[key] ? row[key].trim() : "";
+                }
+            }
+            return "";
+        }
 
         function renderCards(dataArray) {
             currentDataArray = dataArray;
@@ -224,9 +195,14 @@
             const now = new Date().getTime();
 
             dataArray.forEach((row, index) => {
-                if (!row.title && !row.time) return;
+                const timeStr = safeGet(row, "time");
+                const titleStr = safeGet(row, "title");
+                const descStr = safeGet(row, "desc");
+                const imgStr = safeGet(row, "img");
+                const noteStr = safeGet(row, "note");
 
-                // 判斷是否為「最後一個行程」(壓軸)，且「目前時間早於解鎖時間」
+                if (!titleStr && !timeStr) return;
+
                 const isLastCard = (index === dataArray.length - 1);
                 const isLocked = isLastCard && (now < UNLOCK_TIME);
 
@@ -234,11 +210,10 @@
                 slide.className = 'swiper-slide';
 
                 if (isLocked) {
-                    // 🔒 【鎖定狀態】：只留標題與時間，隱藏圖片與描述，換上神秘倒數器！
                     slide.innerHTML = `
                         <div class="card">
-                            <div class="time-badge" style="background:#888;">${row.time || '神秘壓軸'}</div>
-                            <h2>${row.title || '？？？神秘目的地？？？'}</h2>
+                            <div class="time-badge" style="background:#888;">${timeStr || '神秘壓軸'}</div>
+                            <h2>${titleStr || '？？？神秘目的地？？？'}</h2>
                             
                             <div class="locked-box">
                                 <div class="locked-icon">🎁</div>
@@ -255,18 +230,15 @@
                         </div>
                     `;
                 } else {
-                    // 🔓 【正常／解鎖狀態】：顯示完整圖文內容
-                    let imgHtml = row.img && row.img.trim() !== "" 
-                        ? `<div class="card-img-box"><img src="${row.img.trim()}" alt="image"></div>` : "";
-                    let noteHtml = row.note && row.note.trim() !== "" 
-                        ? `<div class="note-box">${row.note}</div>` : "";
+                    let imgHtml = imgStr !== "" ? `<div class="card-img-box"><img src="${imgStr}" alt="image"></div>` : "";
+                    let noteHtml = noteStr !== "" ? `<div class="note-box">${noteStr}</div>` : "";
 
                     slide.innerHTML = `
                         <div class="card">
-                            <div class="time-badge">${row.time || '約會行程'}</div>
-                            <h2>${row.title || ''}</h2>
+                            <div class="time-badge">${timeStr || '約會行程'}</div>
+                            <h2>${titleStr || ''}</h2>
                             ${imgHtml}
-                            <div class="desc">${row.desc || ''}</div>
+                            <div class="desc">${descStr || ''}</div>
                             ${noteHtml}
                         </div>
                     `;
@@ -283,26 +255,20 @@
                 pagination: { el: ".swiper-pagination", clickable: true }
             });
 
-            // 啟動倒數計時監控
             startTimerCheck();
         }
 
         function startTimerCheck() {
             if (countdownInterval) clearInterval(countdownInterval);
-
             countdownInterval = setInterval(() => {
                 const now = new Date().getTime();
                 const distance = UNLOCK_TIME - now;
                 const timerEl = document.getElementById('mystery-timer');
 
                 if (distance < 0) {
-                    // ⏰ 時間到了！自動停止計時並「重新渲染網頁」，卡片直接自動解鎖！
                     clearInterval(countdownInterval);
-                    if (timerEl) {
-                        renderCards(currentDataArray);
-                    }
+                    if (timerEl) renderCards(currentDataArray);
                 } else if (timerEl) {
-                    // 計算時、分、秒
                     const hours = Math.floor(distance / (1000 * 60 * 60));
                     const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
                     const seconds = Math.floor((distance % (1000 * 60)) / 1000);
@@ -311,16 +277,12 @@
             }, 1000);
         }
 
-        // 載入資料初始化
-        if (GOOGLE_SHEET_CSV_URL && GOOGLE_SHEET_CSV_URL.startsWith("http")) {
-            Papa.parse(GOOGLE_SHEET_CSV_URL, {
-                download: true, header: true,
-                complete: (res) => renderCards(res.data && res.data.length > 0 ? res.data : defaultData),
-                error: () => renderCards(defaultData)
-            });
-        } else {
-            renderCards(defaultData);
-        }
+        Papa.parse(GOOGLE_SHEET_CSV_URL, {
+            download: true, 
+            header: true,
+            complete: (res) => renderCards(res.data),
+            error: (err) => console.error("CSV載入失敗：", err)
+        });
     </script>
 </body>
 </html>
