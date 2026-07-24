@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎂 2026.07.26 VIP生日約會通關卡</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background-color: #fdf8f5; color: #4a4a4a; margin: 0; padding: 20px; text-align: center; }
+        .card { max-width: 450px; margin: 0 auto; background: white; border-radius: 20px; padding: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.08); }
+        h1 { color: #d46a6a; font-size: 24px; }
+        .section { background: #faf4f0; border-left: 4px solid #d46a6a; margin: 15px 0; padding: 12px 15px; border-radius: 8px; text-align: left; }
+        .lock-box { background: #f0f0f0; border: 2px dashed #bbb; border-radius: 12px; padding: 20px; margin-top: 20px; }
+        #timer { font-size: 22px; font-weight: bold; color: #d46a6a; margin-top: 10px; }
+        .unlocked-content { display: none; background: #fff0f3; border: 2px solid #ff4d6d; border-radius: 12px; padding: 20px; margin-top: 20px; text-align: left; animation: fadeIn 1s; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h1>🎂 專屬約會通行證 🎂</h1>
+        <p>Happy Birthday, My VIP!</p>
+        
+        <div class="section"><b>🌸 11:30 首部曲：</b>建國忠孝路口接送＋驚喜獻花</div>
+        <div class="section"><b>🎬 12:30 二部曲：</b>美麗華巨幕史詩《奧德賽》</div>
+        <div class="section"><b>☕ 16:00 三部曲：</b>NOKE 忠泰樂生活＋花束美照</div>
+        <div class="section"><b>🍷 18:30 四部曲：</b>頁小館慶生晚餐＋畫盤甜點</div>
+
+        <!-- 鎖定的神祕章節 -->
+        <div id="lockedView" class="lock-box">
+            <h3>🔒 最終章：神秘任務解鎖中</h3>
+            <p>距離最終任務揭曉還有：</p>
+            <div id="timer">計算中...</div>
+        </div>
+
+        <!-- 時間到會自動顯示的解鎖區域 -->
+        <div id="unlockedView" class="unlocked-content">
+            <h3 style="color:#d46a6a; margin-top:0;">🔓 最終任務解鎖：大直薇閣開箱！</h3>
+            <p><b>📍 目的地：</b>大直薇閣精品旅館（專屬車庫）</p>
+            <p><b>✨ 今日任務：</b>進房開箱主題設施、享受泡澡時光！</p>
+            <p><b>🎁 終極驚喜：</b>請在房內等候專屬司機從後車廂送上你的生日實體禮物與卡片！💖</p>
+        </div>
+    </div>
+
+    <script>
+        // 設定解鎖時間：2026年7月26日 20:20:00
+        const unlockDate = new Date("July 26, 2026 20:20:00").getTime();
+
+        const timerInterval = setInterval(function() {
+            const now = new Date().getTime();
+            const distance = unlockDate - now;
+
+            if (distance < 0) {
+                clearInterval(timerInterval);
+                document.getElementById("lockedView").style.display = "none";
+                document.getElementById("unlockedView").style.display = "block";
+            } else {
+                const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+                const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+                document.getElementById("timer").innerHTML = hours + "時 " + minutes + "分 " + seconds + "秒";
+            }
+        }, 1000);
+    </script>
+</body>
+</html>
