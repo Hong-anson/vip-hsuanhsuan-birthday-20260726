@@ -22,7 +22,6 @@
             color: #d46a6a;
             letter-spacing: 1px;
         }
-        /* 使用 dvh 解決手機瀏覽器網址列遮擋問題 */
         .swiper {
             width: 100%;
             height: calc(100vh - 45px);
@@ -38,12 +37,11 @@
             padding: 5px 12px;
             box-sizing: border-box;
         }
-        /* 卡片高度自動適配，並解鎖垂直觸控滾動 */
         .card {
             width: 100%;
             max-width: 360px;
             height: 96%;
-            max-height: 530px; /* 控制黃金最大高度，確保一頁看完 */
+            max-height: 530px;
             background: #ffffff;
             border-radius: 22px;
             box-shadow: 0 10px 25px rgba(212, 106, 106, 0.15);
@@ -53,8 +51,6 @@
             box-sizing: border-box;
             position: relative;
             border: 2px solid #ffe3e8;
-            
-            /* 🚀 關鍵解法：開啟 iOS/Android 原生順暢滾動，並解鎖上下觸控 */
             overflow-y: auto;
             -webkit-overflow-scrolling: touch;
             touch-action: pan-y;
@@ -78,7 +74,6 @@
             line-height: 1.25;
             flex-shrink: 0;
         }
-        /* 📏 縮小圖片為 140px，把螢幕空間還給下面的文字與 Note！ */
         .card-img-box {
             width: 100%;
             height: 140px;
@@ -94,6 +89,28 @@
             height: 100%;
             object-fit: cover;
             display: block;
+        }
+        /* 📍 專屬 Google Map 導航按鈕美化 */
+        .map-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background: #fdf2f4;
+            color: #d46a6a;
+            border: 1px solid #ffccd5;
+            padding: 8px 12px;
+            border-radius: 10px;
+            font-size: 13px;
+            font-weight: bold;
+            text-decoration: none;
+            margin-bottom: 10px;
+            transition: all 0.2s;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.03);
+            flex-shrink: 0;
+        }
+        .map-btn:active {
+            background: #ffe0e6;
+            transform: scale(0.98);
         }
         .desc {
             font-size: 14px;
@@ -111,7 +128,7 @@
             color: #d46a6a;
             margin-top: 10px;
             font-weight: 600;
-            flex-shrink: 0; /* 永遠保持原形，絕不被擠壓 */
+            flex-shrink: 0;
         }
         .locked-box {
             display: flex;
@@ -200,6 +217,30 @@
             return "";
         }
 
+        // 🤖 智慧導航產生器：自動匹配五大行程地圖，也支援試算表 `map` 欄位
+        function getMapUrl(row) {
+            const customMap = safeGet(row, "map");
+            if (customMap && customMap.startsWith("http")) return customMap;
+
+            const text = (safeGet(row, "title") + safeGet(row, "desc") + safeGet(row, "time")).toLowerCase();
+            if (text.includes("忠孝") || text.includes("首部曲") || text.includes("花園")) {
+                return "https://www.google.com/maps/search/?api=1&query=台北市大安區建國南路一段與忠孝東路三段交叉口";
+            }
+            if (text.includes("美麗華") || text.includes("奧德賽") || text.includes("二部曲")) {
+                return "https://www.google.com/maps/search/?api=1&query=大直美麗華影城";
+            }
+            if (text.includes("noke") || text.includes("忠泰") || text.includes("三部曲")) {
+                return "https://www.google.com/maps/search/?api=1&query=NOKE+忠泰樂生活";
+            }
+            if (text.includes("頁小館") || text.includes("四部曲") || text.includes("派對")) {
+                return "https://www.google.com/maps/search/?api=1&query=Restaurant+Page+頁小館";
+            }
+            if (text.includes("薇閣") || text.includes("壓軸") || text.includes("任務")) {
+                return "https://www.google.com/maps/search/?api=1&query=大直薇閣精品旅館";
+            }
+            return "";
+        }
+
         function renderCards(dataArray) {
             currentDataArray = dataArray;
             const wrapper = document.getElementById('card-wrapper');
@@ -213,6 +254,7 @@
                 const descStr = safeGet(row, "desc");
                 const imgStr = safeGet(row, "img");
                 const noteStr = safeGet(row, "note");
+                const mapUrl = getMapUrl(row);
 
                 if (!titleStr && !timeStr) return;
 
@@ -223,6 +265,7 @@
                 slide.className = 'swiper-slide';
 
                 if (isLocked) {
+                    // 🔒 鎖定狀態：完全藏匿地圖連結與按鈕！
                     slide.innerHTML = `
                         <div class="card">
                             <div class="time-badge" style="background:#888;">${timeStr || '神秘壓軸'}</div>
@@ -243,7 +286,9 @@
                         </div>
                     `;
                 } else {
+                    // 🔓 正常解鎖：精美呈現「📍 點我看 Google 地圖導航」按鈕
                     let imgHtml = imgStr !== "" ? `<div class="card-img-box"><img src="${imgStr}" alt="image"></div>` : "";
+                    let mapHtml = mapUrl !== "" ? `<a href="${mapUrl}" target="_blank" class="map-btn">📍 點我開啟 Google 地圖導航 ↗</a>` : "";
                     let noteHtml = noteStr !== "" ? `<div class="note-box">${noteStr}</div>` : "";
 
                     slide.innerHTML = `
@@ -251,6 +296,7 @@
                             <div class="time-badge">${timeStr || '約會行程'}</div>
                             <h2>${titleStr || ''}</h2>
                             ${imgHtml}
+                            ${mapHtml}
                             <div class="desc">${descStr || ''}</div>
                             ${noteHtml}
                         </div>
@@ -266,7 +312,6 @@
                 slidesPerView: 1,
                 spaceBetween: 20,
                 pagination: { el: ".swiper-pagination", clickable: true },
-                // 🚀 關鍵解鎖：告訴 Swiper 遇到邊界時釋放觸控，讓上下滾動與左右滑動和平共處！
                 touchReleaseOnEdges: true
             });
 
