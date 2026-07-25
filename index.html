@@ -163,6 +163,56 @@
             box-shadow: 0 4px 10px rgba(255, 77, 109, 0.3);
             letter-spacing: 1px;
         }
+        /* 🔐 通關密語專屬樣式 */
+        .pin-container {
+            margin-top: 12px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+        }
+        .pin-input {
+            width: 150px;
+            padding: 10px;
+            font-size: 22px;
+            text-align: center;
+            letter-spacing: 8px;
+            border: 2px solid #ffccd5;
+            border-radius: 12px;
+            outline: none;
+            color: #d46a6a;
+            font-weight: bold;
+            background: #ffffff;
+            box-shadow: inset 0 2px 5px rgba(0,0,0,0.05);
+            appearance: none;
+            -webkit-appearance: none;
+            transition: all 0.2s;
+        }
+        .pin-input:focus {
+            border-color: #ff4d6d;
+            box-shadow: 0 0 8px rgba(255, 77, 109, 0.3);
+        }
+        .pin-error {
+            color: #e63946;
+            font-size: 12px;
+            margin-top: 8px;
+            display: none;
+            font-weight: bold;
+            animation: shake 0.3s;
+        }
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+        .early-unlock-link {
+            font-size: 11px;
+            color: #aaa;
+            text-decoration: underline;
+            margin-top: 14px;
+            cursor: pointer;
+            letter-spacing: 0.5px;
+        }
         .swipe-hint {
             position: absolute;
             bottom: 6px;
@@ -197,15 +247,20 @@
     <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
     <script>
         // =========================================================================
-        // 🔗 永久綁定你的 Google 試算表 CSV
+        // 🚨 【設定 1】：通關密語 (預設為你的生日 0302，可隨時修改為 1552 或 0524)
+        const SECRET_PIN = "0524"; 
+
+        // 🔗 【設定 2】：永久綁定你的 Google 試算表 CSV
         const GOOGLE_SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTIZlbBSdvCM40aIyduz3Jfhkbse_r9btX_i-Nvy51fUQUOZxpJvBfEb9RkLtn9qY0QwSQXzrq19GKC/pub?output=csv"; 
 
-        // 🚨 壓軸解鎖時間 (嚴格設定為 2026/07/26 晚間 20:15:00)
+        // 🚨 【設定 3】：壓軸解鎖時間 (設定為 2026/07/26 晚間 20:15:00)
         const UNLOCK_TIME = new Date("2026-07-26T20:15:00").getTime();
         // =========================================================================
 
         let countdownInterval = null;
         let currentDataArray = [];
+        let isPinUnlocked = false; // 記錄密碼是否已解鎖成功
+        let forceShowPin = false;  // 記錄是否啟動了「提早輸入密語」
 
         function safeGet(row, targetKey) {
             for (let key in row) {
@@ -216,7 +271,7 @@
             return "";
         }
 
-        // 🤖 智慧地圖導航：第一站隱藏、第二站精準導航、後續自動匹配
+        // 🤖 智慧地圖導航
         function getMapUrl(row) {
             const customMap = safeGet(row, "map");
             if (customMap && (customMap.toLowerCase() === "none" || customMap.toLowerCase() === "hide" || customMap.toLowerCase() === "no")) {
@@ -224,16 +279,10 @@
             }
 
             const text = (safeGet(row, "title") + safeGet(row, "desc") + safeGet(row, "time")).toLowerCase();
-            
-            // 🚨 智慧防呆 1：第一站 (12:30 / 首部曲 / 軒軒家)，強制移除 Google 地圖按鈕！
             if (text.includes("首部曲") || text.includes("12:30") || text.includes("府上") || text.includes("軒軒家") || text.includes("迎接")) {
                 return "";
             }
-
-            // 優先採用 Excel `map` 欄位的網址
             if (customMap && customMap.startsWith("http")) return customMap;
-
-            // 🤖 智慧導航規則 (當 Excel map 欄位空白時自動補位)
             if (text.includes("二部曲") || text.includes("13:00") || text.includes("午宴") || text.includes("私房")) {
                 return "https://maps.app.goo.gl/9qS47j2QydASZAGQ6";
             }
@@ -247,6 +296,35 @@
                 return "https://www.google.com/maps/search/?api=1&query=大直薇閣精品旅館";
             }
             return "";
+        }
+
+        // 🔐 驗證通關密語邏輯
+        function checkPinAuto(el) {
+            const errorEl = document.getElementById('pin-error');
+            if (errorEl) errorEl.style.display = "none";
+            el.style.borderColor = "#ffccd5";
+
+            // 當輸入滿 4 位數時，毫秒自動比對！
+            if (el.value.length === 4) {
+                if (el.value === SECRET_PIN) {
+                    isPinUnlocked = true;
+                    el.style.borderColor = "#48c774";
+                    el.style.backgroundColor = "#effaf3";
+                    setTimeout(() => {
+                        renderCards(currentDataArray); // 驗證成功！重新渲染顯示終極卡片
+                    }, 300);
+                } else {
+                    if (errorEl) errorEl.style.display = "block";
+                    el.style.borderColor = "#e63946";
+                    el.value = ""; // 答錯自動清空，方便她再猜一次
+                }
+            }
+        }
+
+        // 🔑 司機特許：點擊提前開啟密碼框
+        function triggerEarlyPin() {
+            forceShowPin = true;
+            renderCards(currentDataArray);
         }
 
         function renderCards(dataArray) {
@@ -267,32 +345,64 @@
                 if (!titleStr && !timeStr) return;
 
                 const isLastCard = (index === dataArray.length - 1);
-                const isLocked = isLastCard && (now < UNLOCK_TIME);
+                // 🔒 雙重鎖判定：如果是最後一頁，且「還沒成功解鎖過密碼」，卡片就是鎖定的！
+                const isLocked = isLastCard && (!isPinUnlocked);
 
                 const slide = document.createElement('div');
                 slide.className = 'swiper-slide';
 
                 if (isLocked) {
-                    slide.innerHTML = `
-                        <div class="card">
-                            <div class="time-badge" style="background:#888;">${timeStr || '神秘壓軸'}</div>
-                            <h2>${titleStr || '？？？神秘目的地？？？'}</h2>
-                            
-                            <div class="locked-box">
-                                <div class="locked-icon">🎁</div>
-                                <h3 style="color:#d46a6a; margin:0 0 10px 0;">最高機密・鎖定中</h3>
-                                <p style="color:#666; font-size:14px; line-height:1.5; margin:0;">
-                                    為維持最高度的驚喜與期待感<br>詳細地點與任務內容將於晚餐後揭曉！
-                                </p>
-                                <div id="mystery-timer" class="timer-box">計算倒數中...</div>
-                            </div>
+                    const isTimeUp = (now >= UNLOCK_TIME) || forceShowPin;
 
-                            <div class="note-box" style="border-color:#888; color:#666; text-align:center;">
-                                🔒 解鎖時間：2026/07/26 晚間 20:15
+                    if (!isTimeUp) {
+                        // 狀態 1：【倒數中】時間還沒到，顯示倒數計時與提早解鎖小字
+                        slide.innerHTML = `
+                            <div class="card">
+                                <div class="time-badge" style="background:#888;">${timeStr || '神秘壓軸'}</div>
+                                <h2>${titleStr || '？？？神秘目的地？？？'}</h2>
+                                
+                                <div class="locked-box">
+                                    <div class="locked-icon">🎁</div>
+                                    <h3 style="color:#d46a6a; margin:0 0 6px 0;">最高機密・雙重鎖定中</h3>
+                                    <p style="color:#666; font-size:13px; line-height:1.4; margin:0;">
+                                        為維持最高度的驚喜與期待感<br>此關卡需等待<b>倒數歸零</b>並輸入<b>通關密語</b>！
+                                    </p>
+                                    <div id="mystery-timer" class="timer-box">計算倒數中...</div>
+                                    <div class="early-unlock-link" onclick="triggerEarlyPin()">🔑 司機特許：點此提前輸入密語解鎖</div>
+                                </div>
+
+                                <div class="note-box" style="border-color:#888; color:#666; text-align:center;">
+                                    🔒 解鎖時間：2026/07/26 晚間 20:15
+                                </div>
                             </div>
-                        </div>
-                    `;
+                        `;
+                    } else {
+                        // 狀態 2：【密碼解鎖】時間到（或按了提前解鎖），顯示 4 位數密碼輸入框！
+                        slide.innerHTML = `
+                            <div class="card">
+                                <div class="time-badge" style="background:#ff4d6d;">🔐 密語解鎖關卡</div>
+                                <h2>${titleStr || '？？？神秘目的地？？？'}</h2>
+                                
+                                <div class="locked-box" style="border-color:#ff4d6d; background:#fff9fa;">
+                                    <div class="locked-icon">🔑</div>
+                                    <h3 style="color:#d46a6a; margin:0 0 6px 0;">請輸入 4 位數通關密語</h3>
+                                    <p style="color:#666; font-size:13px; line-height:1.4; margin:0;">
+                                        💡 提示：這個數字，是只有我們能聯想到的專屬默契！
+                                    </p>
+                                    <div class="pin-container">
+                                        <input type="tel" id="pin-code" class="pin-input" maxlength="4" placeholder="••••" autocomplete="off" inputmode="numeric" pattern="[0-9]*" oninput="checkPinAuto(this)" autofocus>
+                                        <div id="pin-error" class="pin-error">❌ 密語錯誤，再猜猜看！</div>
+                                    </div>
+                                </div>
+
+                                <div class="note-box" style="text-align:center;">
+                                    🎉 第一重時間鎖已解除！請輸入密語打開大禮！
+                                </div>
+                            </div>
+                        `;
+                    }
                 } else {
+                    // 🔓 狀態 3：【完美解鎖】密碼正確！顯示完整圖文內容與 Google 地圖導航！
                     let imgHtml = imgStr !== "" ? `<div class="card-img-box"><img src="${imgStr}" alt="image"></div>` : "";
                     let mapHtml = mapUrl !== "" ? `<a href="${mapUrl}" target="_blank" class="map-btn">📍 點我開啟 Google 地圖導航 ↗</a>` : "";
                     let noteHtml = noteStr !== "" ? `<div class="note-box">${noteStr}</div>` : "";
@@ -333,7 +443,11 @@
 
                 if (distance < 0) {
                     clearInterval(countdownInterval);
-                    if (timerEl) renderCards(currentDataArray);
+                    // 時間到了！如果還沒顯示密碼框、也還沒解鎖，自動重新渲染成「密碼輸入介面」
+                    if (!isPinUnlocked && !forceShowPin) {
+                        forceShowPin = true;
+                        renderCards(currentDataArray);
+                    }
                 } else if (timerEl) {
                     const hours = Math.floor(distance / (1000 * 60 * 60));
                     const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
